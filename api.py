@@ -99,10 +99,10 @@ def seleciona_tudo():
 
 
 #CRUD - GET by ID
-@app.route("/transito/<id>", methods=["GET"])
-def seleciona_um(id):
+@app.route("/transito/<endereco>", methods=["GET"])
+def seleciona_um(endereco):
     try:
-        transito_objeto = Transito.query.filter_by(id=id).first()
+        transito_objeto = Transito.query.filter_by(endereco=endereco).first()
         transito_json = transito_objeto.to_json()
         return transito_json
     except Exception as e:
