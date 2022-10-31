@@ -102,7 +102,7 @@ def seleciona_tudo():
 @app.route("/transito/<endereco>", methods=["GET"])
 def seleciona_um(endereco):
     try:
-        transito_objeto = Transito.query.filter_by(endereco=endereco).first()
+        transito_objeto = Transito.query.filter_by(endereco=endereco).order_by(-Transito.id).first()
         transito_json = transito_objeto.to_json()
         return transito_json
     except Exception as e:
