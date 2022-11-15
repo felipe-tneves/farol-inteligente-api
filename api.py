@@ -1,3 +1,4 @@
+#Bibliotecas
 from ast import For
 from cgitb import reset
 from queue import Empty
@@ -15,6 +16,7 @@ import os
 
 #Diretorio onde vai ficar os arquivos de upload
 DIRETORIO = "C:\\Users\\Workspace\\Desktop\\Projects\\farol-inteligente-api\\files\\"
+
 #Conexão com o banco de dados
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATION'] = True
@@ -33,6 +35,7 @@ class Transito(db.Model):
     clima = db.Column(db.String(300))
     endereco = db.Column(db.String(200))
 
+#Função para formatar os valores em json
     def to_json(self):
         return {
             "id": self.id,
@@ -43,8 +46,8 @@ class Transito(db.Model):
             "endereco": self.endereco
         }
 
-
-#yolo com a quantidade carros
+#Yolo 
+#Reconhecimento e contagem de veiculos 
 def yolo(nome_arquivo):
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 
@@ -66,7 +69,7 @@ def yolo(nome_arquivo):
     return i
 
 
-#função para pegar a data e hora
+#Função para pegar a data e hora
 def time_now():
     hora = datetime.datetime.now().strftime("%H:%M:%S")
     data = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -74,7 +77,7 @@ def time_now():
     return [hora, data]
 
 
-#função para pegar o clima tempo
+#Função para pegar o clima tempo
 def climaTempo():
     token = "ee369bc12a04e11edc6af6b841af96e1"
     clima_url = "http://apiadvisor.climatempo.com.br/api/v1/weather/locale/3477/current?token=" + str(
@@ -86,7 +89,7 @@ def climaTempo():
     return data_clima
 
 
-#CRUD - GET
+#CRUD - GET (Apresenta todos os dados da API)
 @app.route("/transito", methods=["GET"])
 def seleciona_tudo():
     try:
@@ -98,7 +101,7 @@ def seleciona_tudo():
         print(e)
 
 
-#CRUD - GET by ID
+#CRUD - GET by ID (Apresenta um dado especifico)
 @app.route("/transito/<endereco>", methods=["GET"])
 def seleciona_um(endereco):
     try:
@@ -109,7 +112,7 @@ def seleciona_um(endereco):
         print(e)
 
 
-#CRUD - POST Simulação
+#CRUD - POST Simulação (Cadastra os dados referente ao transito - Simulação)
 @app.route("/test", methods=["POST"])
 def cadastro_test():
     body = request.get_json()
@@ -132,7 +135,7 @@ def cadastro_test():
         return gera_response(400, "transito", {}, "Erro ao cadastrar")
 
 
-#CRUD - UPDATE
+#CRUD - UPDATE (Atualiza um dado especifico)
 @app.route("/transito/<id>", methods=["PUT"])
 def atualiza(id):
     transito_objeto = Transito.query.filter_by(id=id).first()
@@ -160,7 +163,7 @@ def atualiza(id):
         return gera_response(400, "transito", {}, "Erro ao atualizar")
 
 
-#CRUD - DELETE
+#CRUD - DELETE (Apaga um dado especifico)
 @app.route("/transito/<id>", methods=["DELETE"])
 def deleta(id):
     transito_objeto = Transito.query.filter_by(id=id).first()
@@ -176,7 +179,7 @@ def deleta(id):
         return gera_response(400, "transito", {}, "Erro ao deletar")
 
 
-#lista os arquivos
+#Lista os arquivos (Imagens do transito) 
 @app.route("/arquivos", methods=["GET"])
 def lista_arquivos():
     arquivos = []
@@ -190,13 +193,14 @@ def lista_arquivos():
     return jsonify(arquivos)
 
 
-#dowloads dos arquivos
+#Dowloads dos arquivos 
 @app.route("/arquivos/<nome_do_arquivo>", methods=["GET"])
 def get_arquivo(nome_do_arquivo):
     return send_from_directory(DIRETORIO, nome_do_arquivo, as_attachment=True)
 
 
-#upload de arquivo
+#Upload de arquivo
+#Cadastro de dados automatico no banco de dados
 @app.route("/arquivos", methods=["POST"])
 def post_arquivo():
 
